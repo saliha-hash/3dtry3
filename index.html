@@ -3,127 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050505">
 <title>Vernier Calliper — Virtual Lab</title>
 <style>
-@font-face{font-family:Josorian;src:url('./Josorian-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:Josorian;src:url('./Josorian-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
-:root{color-scheme:dark;--bg:#050505;--panel:#0c0c0d;--line:#55585d;--soft:#303236;--text:#f2f2f2}
-*{box-sizing:border-box}
-html,body{width:100%;min-height:100%;margin:0;background:var(--bg);color:var(--text)}
+@font-face{font-family:Josorian;src:url("./Josorian-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:Josorian;src:url("./Josorian-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+:root{--bg:#050505;--panel:#0e0e0f;--line:#5a5d63;--line2:#2e3034;--text:#f1f2f3;--muted:#aeb1b6}
+*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;background:var(--bg);color:var(--text)}
 body{font-family:Arial,Helvetica,sans-serif;padding:14px;-webkit-font-smoothing:antialiased}
-button,input{font:inherit}
-button{min-height:40px;border:1px solid #777b81;border-radius:8px;padding:9px 12px;color:#f6f6f6;background:linear-gradient(#202124,#101113);cursor:pointer}
-button:hover{background:linear-gradient(#303236,#18191b);border-color:#ddd}
-button:focus-visible,input:focus-visible{outline:2px solid white;outline-offset:2px}
-.page{max-width:1240px;margin:auto}
-header{margin:0 0 15px}
-h1{margin:0;color:#e4e7eb;font:700 clamp(2rem,5vw,3.25rem)/1.08 Josorian,'Segoe Script',cursive;letter-spacing:.02em;text-shadow:0 1px 18px #ffffff20}
-.layout{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(260px,.8fr);gap:13px;align-items:start}
-.viewer-card,.control-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 12px 40px #0008}
-.viewer-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;min-height:54px;padding:9px 11px;border-bottom:1px solid var(--soft);background:#09090a}
-.view-caption{color:#d5d8dc;font-size:.86rem;letter-spacing:.02em}
-.view-actions{display:flex;gap:7px}
-.view-actions button{min-height:35px;padding:7px 10px;font-size:.85rem}
-#viewer{position:relative;width:100%;height:clamp(330px,58vw,600px);min-height:310px;overflow:hidden;background:#000;touch-action:pan-y}
-#viewer canvas{display:block;width:100%;height:100%;outline:none}
-.viewer-hint{padding:10px 12px;color:#aeb1b6;font-size:.81rem;line-height:1.5;border-top:1px solid var(--soft)}
-.control-card{padding:14px}
-h2{margin:0 0 11px;font-size:1.03rem}
-h3{margin:0 0 9px;font-size:.92rem;color:#e7e9eb}
-.section{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--soft)}
-.section:last-child{padding:0;margin:0;border:0}
-.shape-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.shape-grid button{text-align:left}
-.shape-grid button.active{border-color:#eee;background:linear-gradient(#44484d,#1a1b1d);box-shadow:inset 0 0 0 1px #ffffff26}
-.shape-grid button:last-child{grid-column:1/-1}
-.field-row{display:grid;gap:8px}
-.field{display:grid;gap:5px}
-.field label{color:#d8dade;font-size:.84rem}
-input[type=number]{width:100%;min-height:40px;border:1px solid #56595e;border-radius:7px;background:#050505;color:white;padding:8px 10px}
-.range-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;color:#d4d6d9;font-size:.88rem}
-#jawValue{color:#fff;font-variant-numeric:tabular-nums;font-weight:700}
-input[type=range]{width:100%;accent-color:#d0d3d8;cursor:pointer}
-.wide-button{width:100%;margin-top:10px}
-.formula{margin:0;padding:10px 11px;border:1px solid #45484d;border-radius:8px;color:#e3e5e8;background:#080809;line-height:1.6;font-size:.87rem}
-.formula strong{color:white}
-#measurementAnswer{margin:9px 0 0;padding:9px;border:1px solid #3d4146;border-radius:7px;background:#070708;color:#f0f1f2;font-size:.84rem;line-height:1.5;overflow-wrap:anywhere}
-#status{margin:13px 0 0;min-height:40px;padding:9px 10px;border:1px solid #3d4146;border-radius:8px;color:#c9cdd1;background:#080809;font-size:.82rem;line-height:1.5}
-.footnote{margin:12px 2px 0;color:#85898f;font-size:.73rem;line-height:1.45}
-[hidden]{display:none!important}
-@media(max-width:820px){body{padding:10px}.layout{grid-template-columns:1fr}#viewer{height:clamp(310px,75vw,500px)}.control-card{padding:12px}}
-@media(max-width:420px){body{padding:7px}.viewer-top{align-items:flex-start}.view-actions{width:100%}.view-actions button{flex:1}#viewer{min-height:290px}button{padding-left:9px;padding-right:9px}}
+button,input{font:inherit}button{min-height:40px;border:1px solid #7a7d83;border-radius:8px;padding:9px 12px;color:#f5f5f5;background:linear-gradient(180deg,#232528,#121213);cursor:pointer}
+button:hover{border-color:#fff}button.active{border-color:#fff;background:linear-gradient(180deg,#3a3d42,#1b1c1e)}
+.page{max-width:1220px;margin:0 auto}.header{margin:0 0 12px}
+h1{margin:0;font-family:Josorian,"Segoe Script",cursive;font-size:clamp(1.9rem,4.5vw,3rem);color:#e9ebef}
+.layout{display:grid;grid-template-columns:1.7fr .8fr;gap:12px;align-items:start}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line2);background:#080809}
+.cap{font-size:.8rem;color:#d2d5d9;letter-spacing:.04em}.acts{display:flex;gap:6px}.acts button{min-height:32px;font-size:.84rem;padding:6px 10px}
+#viewer{position:relative;width:100%;height:clamp(340px,56vw,600px);background:#000;touch-action:none}
+#viewer canvas{width:100%;height:100%;display:block}.hint{padding:9px 12px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--line2);line-height:1.5}
+.ctrl{padding:14px}h2,h3{margin:0 0 10px;color:#f0f1f2}h2{font-size:1rem}h3{font-size:.92rem}
+.sec{padding-bottom:13px;margin-bottom:13px;border-bottom:1px solid var(--line2)}.sec:last-child{border:0;margin:0;padding:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.grid button{text-align:left}.grid button:last-child{grid-column:1/-1}
+.row{display:grid;gap:8px}.field{display:grid;gap:4px}.field label{font-size:.82rem;color:#d4d6d9}
+input[type=number]{width:100%;min-height:40px;border:1px solid #55585e;border-radius:7px;background:#050505;color:#fff;padding:8px 10px}
+.line{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.88rem}#jawValue{font-weight:700}
+input[type=range]{width:100%;accent-color:#d6d8dc}.wide{width:100%;margin-top:10px}
+.formula{margin:0;padding:10px 11px;border:1px solid #42454a;border-radius:8px;background:#080809;font-size:.86rem;line-height:1.6}
+#ans{margin:10px 0 0;padding:9px 10px;border:1px solid #3a3d42;border-radius:7px;background:#070708;font-size:.82rem;line-height:1.5;overflow-wrap:anywhere}
+#status{margin:10px 0 0;padding:9px 10px;border-radius:7px;border:1px solid #383b40;background:#080809;color:#c2c5c9;font-size:.8rem;min-height:36px}
+.foot{margin:10px 2px 0;color:#7c8086;font-size:.72rem}[hidden]{display:none!important}
+@media(max-width:820px){body{padding:8px}.layout{grid-template-columns:1fr}#viewer{height:clamp(310px,78vw,500px)}}
 </style>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"}}
-</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"}}</script>
 </head>
 <body>
 <main class="page">
-<header><h1>Vernier Calliper</h1></header>
-
+<header class="header"><h1>Vernier Calliper</h1></header>
 <div class="layout">
-<section class="viewer-card" aria-label="3D Vernier calliper viewer">
-  <div class="viewer-top">
-    <span class="view-caption">3D MODEL · POLISHED SILVER</span>
-    <div class="view-actions">
-      <button id="fitButton" type="button">Full View</button>
-      <button id="jawsButton" type="button">Zoom on Jaws</button>
-    </div>
-  </div>
-  <div id="viewer" aria-label="Interactive 3D model. Drag to rotate; pinch or scroll to zoom."></div>
-  <div class="viewer-hint">Drag to rotate. Pinch or scroll to zoom. Select <b>Zoom on Jaws</b> to inspect the scale.</div>
-</section>
-
-<aside class="control-card" aria-label="Calliper controls">
-  <section class="section">
-    <h2>Other Objects</h2>
-    <div class="shape-grid" aria-label="Choose a test object">
-      <button type="button" data-shape="sphere">Sphere</button>
-      <button type="button" data-shape="cube">Cube</button>
-      <button type="button" data-shape="cylinder">Cylinder</button>
-      <button type="button" data-shape="cuboid">Cuboid</button>
-      <button type="button" data-shape="cone">Cone</button>
-    </div>
-  </section>
-
-  <section class="section" id="jawControlPanel">
-    <h3>Jaw Control</h3>
-    <div class="range-line"><label for="jawSlider">Open the jaws</label><span id="jawValue">0%</span></div>
-    <input id="jawSlider" type="range" min="0" max="100" step="1" value="0" aria-label="Jaw opening">
-  </section>
-
-  <section class="section" id="objectPanel" hidden>
-    <h3>Object Dimensions</h3>
-    <div class="field-row">
-      <div class="field" id="fieldA">
-        <label id="labelA" for="dimA">Diameter (mm)</label>
-        <input id="dimA" type="number" min="1" max="100" step="1" value="20" inputmode="decimal">
-      </div>
-      <div class="field" id="fieldB" hidden>
-        <label id="labelB" for="dimB">Height (mm)</label>
-        <input id="dimB" type="number" min="1" max="100" step="1" value="20" inputmode="decimal">
-      </div>
-      <div class="field" id="fieldC" hidden>
-        <label id="labelC" for="dimC">Height (mm)</label>
-        <input id="dimC" type="number" min="1" max="100" step="1" value="20" inputmode="decimal">
-      </div>
-    </div>
-    <p id="measurementAnswer" aria-live="polite">Choose an object to begin.</p>
-    <button id="removeButton" class="wide-button" type="button">Remove Object</button>
-  </section>
-
-  <section class="section">
-    <h3>Measurement Formula</h3>
-    <p class="formula"><strong>Reading</strong> = Main scale reading + (Coinciding vernier division × Least count)</p>
-    <p class="footnote">Entered dimensions describe the test object. Use the visible scale to practise reading the calliper.</p>
-  </section>
-  <p id="status" role="status" aria-live="polite">Loading the 3D calliper…</p>
+<section class="card"><div class="top"><span class="cap">3D MODEL · REAL SILVER</span><div class="acts"><button id="fitBtn">Full View</button><button id="jawBtn">Zoom Jaws</button></div></div><div id="viewer"></div><div class="hint">Drag to rotate. Scroll/pinch to zoom. Use Zoom Jaws for scale reading.</div></section>
+<aside class="card ctrl">
+<div class="sec"><h2>Objects</h2><div class="grid"><button data-s="sphere">Sphere</button><button data-s="cube">Cube</button><button data-s="cylinder">Cylinder</button><button data-s="cuboid">Cuboid</button><button data-s="cone">Cone</button></div></div>
+<div class="sec" id="jawPanel"><h3>Jaw Control</h3><div class="line"><label for="jaw">Open</label><span id="jawValue">0%</span></div><input id="jaw" type="range" min="0" max="100" step="1" value="0"></div>
+<div class="sec" id="objPanel" hidden><h3>Dimensions (mm)</h3><div class="row"><div class="field" id="fA"><label id="lA" for="dA">Diameter</label><input id="dA" type="number" min="1" max="100" step="1" value="20"></div><div class="field" id="fB" hidden><label id="lB" for="dB">Height</label><input id="dB" type="number" min="1" max="100" step="1" value="20"></div><div class="field" id="fC" hidden><label id="lC" for="dC">Height</label><input id="dC" type="number" min="1" max="100" step="1" value="20"></div></div><p id="ans">Choose an object.</p><button id="rem" class="wide">Remove Object</button></div>
+<div class="sec"><h3>Formula</h3><p class="formula"><strong>Reading</strong> = Main Scale + (Vernier Coincidence × Least Count)</p></div>
+<p id="status">Loading caliper…</p>
 </aside>
 </div>
-
-<p class="footnote">3D model: “VernierCaliper” by kg007 on Sketchfab, licensed under CC BY 4.0. Original scale texture mapping is preserved.</p>
+<p class="foot">Model “VernierCaliper” by kg007 (Sketchfab CC BY 4.0). Textures preserved for scale clarity.</p>
 </main>
 <script type="module" src="./script.js?v=20"></script>
 </body>
-        </html>
+  </html>
