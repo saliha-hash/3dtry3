@@ -82,28 +82,32 @@ renderer.setPixelRatio(
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
+renderer.toneMappingExposure = 1.0;
 
 viewer.appendChild(renderer.domElement);
 
 /* Studio lighting */
 scene.add(
   new THREE.HemisphereLight(
-    0xf5f7fa,
-    0x30343a,
-    2.1
+    0xb8c0ca,
+    0x202329,
+    0.85
   )
 );
 
 [
-  [4.0, 4.5, 5.0, 7.0],
-  [3.1, -5.0, 2.8, 4.0],
-  [2.5, 0.0, -3.5, -4.5]
+  [2.0, 4.5, 5.0, 7.0],
+  [0.9, -5.0, 2.8, 4.0],
+  [0.65, 0.0, -3.5, -4.5]
 ].forEach(([intensity, x, y, z]) => {
   const light = new THREE.DirectionalLight(
     0xffffff,
     intensity
   );
+
+  light.position.set(x, y, z);
+  scene.add(light);
+});
 
   light.position.set(x, y, z);
   scene.add(light);
@@ -321,13 +325,13 @@ function makeMainScaleTexture() {
           ? band.mid
           : band.short;
 
-      ctx.strokeStyle = "#080a0c";
+      ctx.strokeStyle = "#000000";
 
       ctx.lineWidth = isTen
+       ? 3.2
+       : isFive
         ? 2.7
-        : isFive
-          ? 2.15
-          : 1.65;
+         : 2.2;
 
       ctx.beginPath();
       ctx.moveTo(x, band.tickTop);
@@ -356,7 +360,7 @@ function makeMainScaleTexture() {
   const texture = new THREE.CanvasTexture(canvas);
 
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.flipY = false;
+  texture.flipY = true;
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -421,19 +425,10 @@ function enhanceExistingTexture(texture) {
   if (!ctx) return;
 
   try {
-    ctx.drawImage(
-      image,
-      0,
-      0,
-      width,
-      height
-    );
+    ctx.drawImage(image, 0, 0, width, height);
 
     const frame = ctx.getImageData(
-      0,
-      0,
-      width,
-      height
+      0, 0, width, height
     );
 
     const pixels = frame.data;
@@ -448,14 +443,24 @@ function enhanceExistingTexture(texture) {
         0.7152 * g +
         0.0722 * b;
 
-      /* Increase contrast to make lines darker */
-      const enhanced = clampByte(
-        128 + (luminance - 128) * 1.34
-      );
+      if (luminance < 115) {
+        /*
+          Make dark scale markings nearly black.
+        */
+        pixels[i] = 3;
+        pixels[i + 1] = 4;
+        pixels[i + 2] = 5;
 
-      pixels[i] = clampByte(enhanced * 0.97);
-      pixels[i + 1] = clampByte(enhanced * 0.985);
-      pixels[i + 2] = clampByte(enhanced * 1.015);
+      } else if (luminance < 175) {
+        /*
+          Increase contrast in medium-dark pixels.
+        */
+        const factor = 0.48;
+
+        pixels[i] = Math.round(r * factor);
+        pixels[i + 1] = Math.round(g * factor);
+        pixels[i + 2] = Math.round(b * factor);
+      }
     }
 
     ctx.putImageData(frame, 0, 0);
@@ -469,9 +474,10 @@ function enhanceExistingTexture(texture) {
     texture.needsUpdate = true;
 
     enhancedTextures.add(texture);
+
   } catch (error) {
     console.warn(
-      "Could not enhance a texture:",
+      "Could not enhance texture:",
       error
     );
   }
@@ -1051,7 +1057,21 @@ function selectShape(selectedShape) {
   }
 
   shape = selectedShape;
+  const defaults = {
+  sphere: [20, 20, 20],
+  cube: [20, 20, 20],
+  cylinder: [20, 30, 20],
+  cuboid: [30, 18, 12],
+  cone: [20, 30, 20]
+};
 
+const values = defaults[selectedShape];
+
+if (values) {
+  $("dimA").value = values[0];
+  $("dimB").value = values[1];
+  $("dimC").value = values[2];
+}
   if (!obj) {
     obj = new THREE.Mesh(
       new THREE.BufferGeometry(),
