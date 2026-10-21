@@ -187,50 +187,27 @@ function makeMainScaleTexture() {
   const ctx = canvas.getContext("2d");
 
   if (!ctx) {
-    throw new Error(
-      "Could not create the ruler texture."
-    );
+    throw new Error("Could not create the ruler texture.");
   }
 
-  /* Polished brushed-silver background */
-  const base = ctx.createLinearGradient(
-    0,
-    0,
-    0,
-    SCALE_TEX_HEIGHT
+  /* Clean silver background */
+  const background = ctx.createLinearGradient(
+    0, 0, 0, canvas.height
   );
 
-  base.addColorStop(0.00, "#9fa7b0");
-  base.addColorStop(0.14, "#e9edf1");
-  base.addColorStop(0.31, "#b9c0c8");
-  base.addColorStop(0.49, "#f2f4f6");
-  base.addColorStop(0.67, "#adb5be");
-  base.addColorStop(0.84, "#e4e8ec");
-  base.addColorStop(1.00, "#a4acb5");
+  background.addColorStop(0, "#c5ccd3");
+  background.addColorStop(0.25, "#f1f3f5");
+  background.addColorStop(0.55, "#d4dae0");
+  background.addColorStop(0.8, "#f4f6f8");
+  background.addColorStop(1, "#b9c1c9");
 
-  ctx.fillStyle = base;
-  ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  /* Very subtle metallic brushing */
-  for (let y = 0; y < canvas.height; y += 5) {
-    ctx.fillStyle =
-      y % 10 === 0
-        ? "rgba(255,255,255,0.075)"
-        : "rgba(25,30,36,0.025)";
-
-    ctx.fillRect(y * 0, y, canvas.width, 1);
-  }
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   /*
-    Three strips preserve the existing texture's
-    three-row layout. They are part of one texture.
+    Three texture bands are retained for compatibility
+    with the original model's ruler UV layout.
   */
-
   const bands = [
     {
       top: 52,
@@ -239,7 +216,8 @@ function makeMainScaleTexture() {
       short: 27,
       mid: 47,
       long: 69,
-      labelY: 166
+      labelY: 166,
+      font: 21
     },
     {
       top: 220,
@@ -248,7 +226,8 @@ function makeMainScaleTexture() {
       short: 22,
       mid: 39,
       long: 57,
-      labelY: 312
+      labelY: 312,
+      font: 19
     },
     {
       top: 360,
@@ -257,28 +236,25 @@ function makeMainScaleTexture() {
       short: 21,
       mid: 38,
       long: 55,
-      labelY: 449
+      labelY: 449,
+      font: 19
     }
   ];
 
-  const maxMillimetres = Math.floor(
+  const maxMM = Math.floor(
     (SCALE_TEX_WIDTH - ZERO_PX - 35) /
     RULER_PX_PER_MM
   );
 
-  bands.forEach((band, bandIndex) => {
-    /* Silver strip */
+  bands.forEach(band => {
+    /* Silver ruler strip */
     const strip = ctx.createLinearGradient(
-      0,
-      band.top,
-      0,
-      band.bottom
+      0, band.top, 0, band.bottom
     );
 
-    strip.addColorStop(0, "#dfe4e9");
-    strip.addColorStop(0.42, "#c4cbd3");
-    strip.addColorStop(0.78, "#e9edf0");
-    strip.addColorStop(1, "#b8c0c8");
+    strip.addColorStop(0, "#e7ebef");
+    strip.addColorStop(0.5, "#cbd2d9");
+    strip.addColorStop(1, "#e8ecf0");
 
     ctx.fillStyle = strip;
 
@@ -289,33 +265,19 @@ function makeMainScaleTexture() {
       band.bottom - band.top
     );
 
-    /* Thin strip boundaries */
-    ctx.strokeStyle = "rgba(40,46,53,0.48)";
-    ctx.lineWidth = 1.5;
-
-    ctx.beginPath();
-    ctx.moveTo(0, band.top + 1);
-    ctx.lineTo(canvas.width, band.top + 1);
-
-    ctx.moveTo(0, band.bottom - 1);
-    ctx.lineTo(canvas.width, band.bottom - 1);
-    ctx.stroke();
-
-    /* Dark, clear millimetre divisions */
-    for (
-      let mm = 0;
-      mm <= maxMillimetres;
-      mm++
-    ) {
-      const x =
-        ZERO_PX + mm * RULER_PX_PER_MM;
+    /*
+      Draw divisions from the TOP DOWN.
+      All scale lines are dark and readable.
+    */
+    for (let mm = 0; mm <= maxMM; mm++) {
+      const x = ZERO_PX + mm * RULER_PX_PER_MM;
 
       if (x >= canvas.width - 2) break;
 
       const isTen = mm % 10 === 0;
       const isFive = mm % 5 === 0;
 
-      const length = isTen
+      const tickLength = isTen
         ? band.long
         : isFive
           ? band.mid
@@ -324,22 +286,23 @@ function makeMainScaleTexture() {
       ctx.strokeStyle = "#000000";
 
       ctx.lineWidth = isTen
-       ? 3.2
-       : isFive
-        ? 2.7
-         : 2.2;
+        ? 3.2
+        : isFive
+          ? 2.6
+          : 2.1;
 
       ctx.beginPath();
+
       ctx.moveTo(x, band.tickTop);
-      ctx.lineTo(x, band.tickTop + length);
+      ctx.lineTo(x, band.tickTop + tickLength);
+
       ctx.stroke();
 
-      /* Numbers every 10 mm */
+      /* Main-scale numbers */
       if (isTen) {
-        ctx.fillStyle = "#050607";
+        ctx.fillStyle = "#000000";
 
-        ctx.font =
-          `700 ${bandIndex === 0 ? 21 : 19}px Arial`;
+        ctx.font = `bold ${band.font}px Arial`;
 
         ctx.textAlign = "center";
         ctx.textBaseline = "alphabetic";
@@ -351,11 +314,28 @@ function makeMainScaleTexture() {
         );
       }
     }
+
+    /* Thin boundaries */
+    ctx.strokeStyle = "#333940";
+    ctx.lineWidth = 1;
+
+    ctx.strokeRect(
+      0,
+      band.top,
+      canvas.width,
+      band.bottom - band.top
+    );
   });
 
   const texture = new THREE.CanvasTexture(canvas);
 
   texture.colorSpace = THREE.SRGBColorSpace;
+
+  /*
+    IMPORTANT:
+    Keep the texture orientation consistent with the
+    UV mapping performed by calibrateMainScale().
+  */
   texture.flipY = true;
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -373,7 +353,6 @@ function makeMainScaleTexture() {
 
   return texture;
 }
-
 /* =========================================================
    DARKEN ORIGINAL TEXTURE MARKINGS
    No additional vernier ticks are drawn over the original.
@@ -439,23 +418,17 @@ function enhanceExistingTexture(texture) {
         0.7152 * g +
         0.0722 * b;
 
-      if (luminance < 115) {
-        /*
-          Make dark scale markings nearly black.
-        */
-        pixels[i] = 3;
-        pixels[i + 1] = 4;
-        pixels[i + 2] = 5;
+      if (luminance < 155) {
+  /* Make dark engraved divisions black */
+  pixels[i] = 0;
+  pixels[i + 1] = 0;
+  pixels[i + 2] = 0;
 
-      } else if (luminance < 175) {
-        /*
-          Increase contrast in medium-dark pixels.
-        */
-        const factor = 0.48;
-
-        pixels[i] = Math.round(r * factor);
-        pixels[i + 1] = Math.round(g * factor);
-        pixels[i + 2] = Math.round(b * factor);
+} else if (luminance < 195) {
+  /* Darken medium-grey markings */
+  pixels[i] = Math.round(r * 0.35);
+  pixels[i + 1] = Math.round(g * 0.35);
+  pixels[i + 2] = Math.round(b * 0.35);
       }
     }
 
@@ -535,9 +508,10 @@ function polishModelMaterials(model, mainScaleTexture) {
           material.metalness = 0.86;
           material.roughness = 0.22;
         } else {
-          material.color.set(0xe1e5e9);
-          material.metalness = 0.72;
-          material.roughness = 0.27;
+          material.color.set(0xe0e5ea);
+material.metalness = 0.68;
+material.roughness = 0.23;
+material.envMapIntensity = 1.25;
         }
 
         material.envMapIntensity = 1.3;
