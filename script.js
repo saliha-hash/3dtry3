@@ -109,10 +109,6 @@ scene.add(
   scene.add(light);
 });
 
-  light.position.set(x, y, z);
-  scene.add(light);
-});
-
 /* Environment reflections for metal */
 const pmrem = new THREE.PMREMGenerator(renderer);
 const room = new RoomEnvironment();
