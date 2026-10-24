@@ -1203,7 +1203,7 @@ function placeObject() {
 
 function selectShape(selectedShape) {
   if (!ready || !rig) {
-    say("Wait for the caliper to load.");
+    say("Please Wait for the caliper to load.");
     return;
   }
 
