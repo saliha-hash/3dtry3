@@ -197,10 +197,10 @@ const OBJECT_FINISH = {
   },
 
   flat: {
-    metalness: 0.45,
-    roughness: 0.18,
+    metalness: 0.25,
+    roughness: 0.22,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.12,
+    clearcoatRoughness: 0.10,
     envMapIntensity: 1.0
   }
 };
