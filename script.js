@@ -167,7 +167,7 @@ if (room.dispose) {
    ========================================================= */
 
 const OBJECT_COLOURS = {
-  sphere: 0xffff00,
+  sphere: 0xe24f67,
   cube: 0x4c9de8,
   cylinder: 0x44c49a,
   cuboid: 0xe5b34a,
