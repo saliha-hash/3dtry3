@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#030405"
+>
+
+<meta
+  name="description"
+  content="An interactive 3D Vernier calliper laboratory for physics practice."
+>
+
+<title>Vernier Calliper Laboratory</title>
+
+<style>
+
+@font-face {
+  font-family: "Josorian";
+
+  src: url("./Josorian-Regular.ttf")
+    format("truetype");
+
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Josorian";
+
+  src: url("./Josorian-Bold.ttf")
+    format("truetype");
+
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+:root {
+  color-scheme: dark;
+
+  --bg: #050607;
+  --panel: #111418;
+  --line: #343a41;
+  --text: #edf0f3;
+  --muted: #a6adb5;
+  --steel: #d0d6dc;
+}
+
+body {
+  margin: 0;
+  padding: 12px;
+
+  background: var(--bg);
+  color: var(--text);
+
+  font: 15px/1.5 system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+header {
+  text-align: center;
+
+  margin: 10px 0 18px;
+}
+
+h1 {
+  margin: 0;
+
+  font: 400 clamp(32px, 6vw, 48px)/1.18
+    "Josorian",
+    "Brush Script MT",
+    cursive;
+
+  letter-spacing: .5px;
+
+  color: #eef1f4;
+
+  text-shadow:
+    0 1px 9px rgba(230, 236, 242, .12);
+}
+
+.rule {
+  width: 100px;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #b7c0c8,
+    transparent
+  );
+
+  margin: 12px auto 0;
+}
+
+/* =====================================================
+   3D VIEWER
+   ===================================================== */
+
+.stage {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid #626a73;
+  border-radius: 9px;
+
+  background: #030405;
+
+  box-shadow:
+    0 0 0 1px
+    rgba(255, 255, 255, .025) inset;
+}
+
+#viewer {
+  width: 100%;
+
+  height: clamp(300px, 58vw, 520px);
+
+  touch-action: none;
+}
+
+#viewer canvas {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+}
+
+/* =====================================================
+   VIEW BUTTONS
+   ===================================================== */
+
+.view-tools {
+  position: absolute;
+
+  right: 10px;
+  bottom: 10px;
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+.view-tools button {
+  min-height: 38px;
+
+  padding: 7px 13px;
+
+  font-size: 13px;
+
+  background: rgba(18, 21, 25, .96);
+}
+
+/* =====================================================
+   PANELS
+   ===================================================== */
+
+.panel {
+  margin-top: 14px;
+
+  padding: 16px;
+
+  background: linear-gradient(
+    145deg,
+    #14181c,
+    #0f1215
+  );
+
+  border: 1px solid var(--line);
+
+  border-radius: 9px;
+}
+
+h2 {
+  font-size: 18px;
+
+  font-weight: 650;
+
+  margin: 0 0 10px;
+
+  color: #eef1f4;
+}
+
+.note {
+  color: var(--muted);
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+  margin: 0 0 14px;
+}
+
+/* =====================================================
+   JAW SLIDER
+   ===================================================== */
+
+.slider-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 13px;
+
+  color: #d0d5da;
+}
+
+#jawSlider {
+  flex: 1;
+
+  min-width: 0;
+
+  height: 28px;
+
+  accent-color: var(--steel);
+}
+
+#jawValue {
+  min-width: 38px;
+
+  text-align: right;
+
+  color: #f1f3f5;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+
+button {
+  padding: 10px 14px;
+
+  min-height: 42px;
+
+  border: 1px solid #555e67;
+
+  border-radius: 8px;
+
+  background: #20252b;
+
+  color: var(--text);
+
+  font: inherit;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+    background .15s,
+    border-color .15s;
+}
+
+button:hover {
+  background: #2a3037;
+
+  border-color: #8e98a2;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #e0e5ea;
+
+  outline-offset: 2px;
+}
+
+/* =====================================================
+   OBJECT SHAPES
+   ===================================================== */
+
+.shapes {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+.shapes button.active {
+  background: #424950;
+
+  border-color: #d0d6dc;
+
+  color: #fff;
+}
+
+/* =====================================================
+   DIMENSION INPUTS
+   ===================================================== */
+
+.fields {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 14px;
+}
+
+label {
+  display: block;
+
+  font-size: 13px;
+
+  color: #d2d7dc;
+
+  margin-bottom: 6px;
+}
+
+input[type="number"] {
+  width: 100%;
+
+  min-width: 0;
+
+  padding: 10px;
+
+  background: #080a0c;
+
+  color: var(--text);
+
+  border: 1px solid #454d56;
+
+  border-radius: 7px;
+
+  font: inherit;
+}
+
+input[type="number"]:focus {
+  border-color: #cbd2d9;
+}
+
+/* =====================================================
+   MEASUREMENT RESULT
+   ===================================================== */
+
+.result {
+  margin-top: 14px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #30363d;
+
+  border-radius: 8px;
+
+  background: #090b0d;
+}
+
+.result b {
+  display: block;
+
+  font-size: 13px;
+
+  color: var(--muted);
+
+  font-weight: 500;
+
+  margin-bottom: 4px;
+}
+
+#measurementAnswer {
+  font-size: 17px;
+
+  font-weight: 650;
+
+  overflow-wrap: anywhere;
+}
+
+#removeButton {
+  margin-top: 14px;
+}
+
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+#status {
+  font-size: 13px;
+
+  line-height: 1.55;
+
+  color: #c3c9d0;
+
+  margin-top: 12px;
+}
+
+/* =====================================================
+   FORMULA
+   ===================================================== */
+
+.formula {
+  font-size: 14px;
+
+  line-height: 1.9;
+
+  color: #dde2e7;
+}
+
+/* =====================================================
+   MODEL ATTRIBUTION
+   ===================================================== */
+
+.credit {
+  padding: 18px 5px 8px;
+
+  text-align: center;
+
+  color: #828b94;
+
+  font-size: 11px;
+
+  line-height: 1.7;
+}
+
+.credit a {
+  color: #b8c0c8;
+
+  text-underline-offset: 3px;
+}
+
+.credit a:hover {
+  color: #fff;
+}
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+  body {
+    padding: 8px;
+  }
+
+  .panel {
+    padding: 13px;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  .view-tools {
+    right: 8px;
+
+    bottom: 8px;
+
+    gap: 6px;
+  }
+
+  .view-tools button {
+    padding: 7px 10px;
+
+    font-size: 12px;
+  }
+
+  .shapes {
+    gap: 7px;
+  }
+
+  .shapes button {
+    padding: 9px 12px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  button {
+    transition: none;
+  }
+
+}
+
+</style>
+
+<script type="importmap">
+
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
+  }
+}
+
+</script>
+
+</head>
+
+<body>
+
+<main class="app">
+
+  <header>
+
+    <h1>Vernier Calliper</h1>
+
+    <div class="rule"></div>
+
+  </header>
+
+  <div class="stage">
+
+    <div
+      id="viewer"
+      aria-label="Interactive 3D Vernier calliper"
+    ></div>
+
+    <div class="view-tools">
+
+      <button
+        id="fitButton"
+        type="button"
+      >
+        Full view
+      </button>
+
+      <button
+        id="jawsButton"
+        type="button"
+      >
+        Zoom on jaws
+      </button>
+
+    </div>
+
+  </div>
+
+  <section
+    class="panel"
+    id="jawControlPanel"
+  >
+
+    <h2>Jaw Opening</h2>
+
+    <p class="note">
+      Move the slider to open or close the jaws.
+      Drag to rotate the model and pinch to zoom.
+      Once zoomed in, drag with one finger to move the view.
+    </p>
+
+    <div class="slider-row">
+
+      <span>Closed</span>
+
+      <input
+        id="jawSlider"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        aria-label="Jaw opening"
+      >
+
+      <span>Open</span>
+
+      <span id="jawValue">0%</span>
+
+    </div>
+
+  </section>
+
+  <section class="panel">
+
+    <h2>Measure an Object</h2>
+
+    <p class="note">
+      Choose a shape and enter its dimensions
+      in millimetres. The first dimension
+      controls the jaw opening.
+    </p>
+
+    <div class="shapes">
+
+      <button
+        type="button"
+        data-shape="sphere"
+      >
+        Sphere
+      </button>
+
+      <button
+        type="button"
+        data-shape="cube"
+      >
+        Cube
+      </button>
+
+      <button
+        type="button"
+        data-shape="cylinder"
+      >
+        Cylinder
+      </button>
+
+      <button
+        type="button"
+        data-shape="cuboid"
+      >
+        Cuboid
+      </button>
+
+      <button
+        type="button"
+        data-shape="cone"
+      >
+        Cone
+      </button>
+
+    </div>
+
+    <div id="objectPanel" hidden>
+
+      <div class="fields">
+
+        <div id="fieldA">
+
+          <label
+            id="labelA"
+            for="dimA"
+          >
+            Diameter (mm)
+          </label>
+
+          <input
+            id="dimA"
+            type="number"
+            min="1"
+            max="100"
+            step="any"
+            value="20"
+            inputmode="decimal"
+          >
+
+        </div>
+
+        <div id="fieldB">
+
+          <label
+            id="labelB"
+            for="dimB"
+          >
+            Height (mm)
+          </label>
+
+          <input
+            id="dimB"
+            type="number"
+            min="1"
+            max="100"
+            step="any"
+            value="20"
+            inputmode="decimal"
+          >
+
+        </div>
+
+        <div id="fieldC">
+
+          <label
+            id="labelC"
+            for="dimC"
+          >
+            Height (mm)
+          </label>
+
+          <input
+            id="dimC"
+            type="number"
+            min="1"
+            max="100"
+            step="any"
+            value="20"
+            inputmode="decimal"
+          >
+
+        </div>
+
+      </div>
+
+      <div class="result">
+
+        <b>Object in the jaws</b>
+
+        <div id="measurementAnswer"></div>
+
+      </div>
+
+      <button
+        id="removeButton"
+        type="button"
+      >
+        Remove Object
+      </button>
+
+    </div>
+
+    <div
+      id="status"
+      role="status"
+      aria-live="polite"
+    >
+      Loading model...
+    </div>
+
+  </section>
+
+  <section class="panel">
+
+    <h2>Vernier Calliper Formula</h2>
+
+    <div class="formula">
+
+      <strong>
+        Reading = Main Scale Reading + Vernier Scale Reading
+      </strong>
+
+      <br>
+
+      Vernier Scale Reading =
+      Coinciding Division × Least Count
+
+    </div>
+
+  </section>
+
+  <footer class="credit">
+
+    3D model adapted from
+
+    <a
+      href="https://sketchfab.com/3d-models/verniercaliper-205ebdec7304449bb8d2effbfe272ec8"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      VernierCaliper by kg007
+    </a>.
+
+    Scale texture and materials modified.
+
+    Licensed under
+
+    <a
+      href="https://creativecommons.org/licenses/by/4.0/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      CC BY 4.0
+    </a>.
+
+  </footer>
+
+</main>
+
+<script
+  type="module"
+  src="./script.js?v=27"
+></script>
+
+</body>
+
+</html>
